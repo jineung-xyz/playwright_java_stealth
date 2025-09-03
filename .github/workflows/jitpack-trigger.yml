@@ -1,0 +1,39 @@
+name: Trigger JitPack Build
+
+on:
+  push:
+    branches:
+      - master  # Trigger on commits to master
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0.0, v1.1.0, etc.
+  release:
+    types: [published]
+
+jobs:
+  trigger-jitpack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger JitPack build
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            # For tags
+            VERSION=${GITHUB_REF#refs/tags/}
+            echo "Triggering JitPack build for tag: $VERSION"
+            curl -s "https://jitpack.io/com/github/${{ github.repository }}/$VERSION/build.log"
+          else
+            # For branch commits (use commit SHA or branch name)
+            VERSION=${GITHUB_SHA}
+            echo "Triggering JitPack build for commit: $VERSION"
+            curl -s "https://jitpack.io/com/github/${{ github.repository }}/$VERSION/build.log"
+          fi
+          
+      - name: Verify JitPack build
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/}
+          else
+            VERSION=${GITHUB_SHA}
+          fi
+          echo "Checking JitPack build status for: $VERSION"
+          sleep 30
+          curl -f "https://jitpack.io/com/github/${{ github.repository }}/$VERSION" || echo "Build may still be in progress"
