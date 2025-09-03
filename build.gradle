@@ -1,12 +1,10 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'application'
 }
 
-group = 'com.playwright'
-version = '1.0.0'
-archivesBaseName = 'playwright-java-stealth'
+group = 'com.github.jineung-xyz'
+version = (findProperty("version") ?: "1.0.0")
 
 repositories {
     mavenCentral()
@@ -29,20 +27,29 @@ java {
     withJavadocJar()
 }
 
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifactId = "playwright-java-stealth"
+            pom {
+                name = "playwright-java-stealth"
+                description = "Playwright Java stealth helpers"
+                url = "https://github.com/jineung-xyz/playwright_java_stealth"
+                licenses { 
+                    license { 
+                        name = "Apache-2.0"
+                        url = "https://www.apache.org/licenses/LICENSE-2.0" 
+                    } 
+                }
+                scm { 
+                    url = "https://github.com/jineung-xyz/playwright_java_stealth.git" 
+                }
+            }
+        }
+    }
+}
+
 test {
     useJUnitPlatform()
-}
-
-application {
-    mainClass = project.findProperty('mainClass') ?: 'com.playwright.stealth.examples.BasicExample'
-}
-
-task runBasicExample(type: JavaExec) {
-    classpath = sourceSets.main.runtimeClasspath
-    mainClass = 'com.playwright.stealth.examples.BasicExample'
-}
-
-task runAdvancedExample(type: JavaExec) {
-    classpath = sourceSets.main.runtimeClasspath
-    mainClass = 'com.playwright.stealth.examples.AdvancedExample'
 }
